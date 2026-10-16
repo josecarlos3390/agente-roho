@@ -231,6 +231,12 @@ with st.sidebar:
             with st.spinner("Conectando…"):
                 diagnostico = db.probar_conexion()
             (st.success if diagnostico.ok else st.error)(diagnostico.detalle)
+    elif ajustes.es_plantilla:
+        st.warning(
+            "Modo: **datos de ejemplo**\n\n`.env.local` todavía tiene los valores de la "
+            "plantilla. Edítalo con tu servidor, base, usuario y contraseña para "
+            "trabajar con datos reales."
+        )
     else:
         st.warning("Modo: **datos de ejemplo**\n\nNo hay `.env.local` con `MSSQL_CONNSTRING`.")
 

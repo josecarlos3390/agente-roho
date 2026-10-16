@@ -49,9 +49,18 @@ def mes_completo_por_defecto(mensual: pd.DataFrame, ultima_fecha) -> pd.Timestam
 
 
 def _pct_variacion(actual: float, base: float | None) -> float | None:
-    if base in (None, 0) or pd.isna(base):
+    """Variación porcentual segura ante None, NaN y pd.NA.
+
+    Ojo: no usar ``base in (None, 0)``; comparar con pd.NA produce
+    "boolean value of NA is ambiguous" cuando una dimensión no existía en el
+    periodo de comparación.
+    """
+    if base is None or pd.isna(base):
         return None
-    return (actual / base - 1.0) * 100.0
+    base = float(base)
+    if base == 0 or pd.isna(actual):
+        return None
+    return (float(actual) / base - 1.0) * 100.0
 
 
 def kpis(mensual: pd.DataFrame, mes) -> dict:

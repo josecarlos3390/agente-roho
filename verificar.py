@@ -30,10 +30,36 @@ def check(nombre: str, condicion: bool, detalle: str = "") -> None:
 
 
 print("\n[1] Datos de ejemplo")
+modelo = modelo_mod.por_defecto()
 df = demo.generar(500, semilla=1)
 check("genera las filas pedidas", len(df) == 500, f"{len(df)} filas")
-check("tiene las columnas del modelo", {"Fecha", "Importe", "Cantidad", "Tienda", "Margen"}.issubset(df.columns))
+columnas_modelo = {
+    modelo.fecha, modelo.transaccion, modelo.tipo, modelo.articulo, modelo.descripcion,
+    modelo.categoria, modelo.familia, modelo.marca, modelo.proveedor, modelo.tienda,
+    modelo.canal, modelo.cantidad, modelo.importe, modelo.costo, modelo.margen,
+}
+faltan = sorted(columnas_modelo - set(df.columns))
+check(
+    "el demo cubre TODAS las columnas del modelo",
+    not faltan,
+    f"faltan: {faltan}" if faltan else f"{len(columnas_modelo)} columnas",
+)
 check("incluye nulos para probar calidad", df.isna().any().any())
+
+from src import config as config_mod  # noqa: E402
+
+check(
+    "detecta la plantilla sin editar",
+    config_mod.es_cadena_de_plantilla(
+        r"Server=HOST\INSTANCIA,1433;Database=BASE_DE_DATOS;User Id=USUARIO;Password=CLAVE"
+    ),
+)
+check(
+    "no confunde una conexión real con la plantilla",
+    not config_mod.es_cadena_de_plantilla(
+        "Server=10.1.2.3,1433;Database=Ventas;User Id=lector;Password=secreta"
+    ),
+)
 
 print("\n[2] Alcance por usuario")
 total = Alcance("local", "administrador local", {})
@@ -55,7 +81,6 @@ except ValueError:
     check("rechaza nombre de columna inyectable", True)
 
 print("\n[3] SQL parametrizado")
-modelo = modelo_mod.por_defecto()
 sql, params = queries.sql_detalle(
     restringido,
     modelo,
@@ -133,6 +158,16 @@ try:
         check("sin excepciones al ejecutar app.py", False, detalle)
     else:
         check("sin excepciones al ejecutar app.py", True, f"{len(at.metric)} métricas en pantalla")
+
+    # Un error capturado por el panel (st.error + st.stop) no genera excepción,
+    # pero deja la pantalla vacía. Estas dos comprobaciones detectan ese caso.
+    errores = [str(getattr(e, "value", "")) for e in getattr(at, "error", [])]
+    check("el panel no muestra errores", not errores, "; ".join(errores)[:160])
+    check(
+        "el panel pinta métricas",
+        len(at.metric) >= 4,
+        f"{len(at.metric)} métricas (¿modo demo roto o sin datos?)",
+    )
 except Exception:  # noqa: BLE001
     check("sin excepciones al ejecutar app.py", False, traceback.format_exc(limit=4))
 

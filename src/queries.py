@@ -41,6 +41,22 @@ def _columnas_texto(modelo: Modelo) -> set[str]:
     }
 
 
+def _es_ausente(valor) -> bool:
+    """True para None, cadena vacía, NaN y pd.NA, sin depender de pandas.
+
+    Evita el error "boolean value of NA is ambiguous" que aparece al comparar
+    pd.NA con None o con cadenas.
+    """
+    if valor is None:
+        return True
+    if isinstance(valor, str):
+        return not valor.strip()
+    try:
+        return bool(valor != valor)  # NaN es lo único distinto de sí mismo
+    except Exception:  # noqa: BLE001 - pd.NA lanza al convertirse a bool
+        return True
+
+
 def _where(
     alcance: Alcance,
     modelo: Modelo,
@@ -60,7 +76,7 @@ def _where(
         params.append(hasta)
 
     for columna, valores in (filtros or {}).items():
-        limpios = [v for v in valores if v not in (None, "")]
+        limpios = [v for v in valores if not _es_ausente(v)]
         if not limpios:
             continue
         marcadores = ",".join("?" for _ in limpios)

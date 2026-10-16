@@ -41,6 +41,27 @@ def _get(clave: str, por_defecto: str | None = None) -> str | None:
     return os.environ.get(clave) or _ENV.get(clave) or por_defecto
 
 
+# Valores de la plantilla .env.local.example. Mientras sigan presentes, la
+# configuración NO está lista: se trata como "sin conexión" y el panel arranca en
+# modo demo, en lugar de fallar con un error de conexión incomprensible.
+PATRONES_PLANTILLA = (
+    "host\\instancia",
+    "database=base_de_datos",
+    "user id=usuario",
+    "password=clave",
+    "server=tu_servidor",
+    "server=host",
+)
+
+
+def es_cadena_de_plantilla(cadena: str | None) -> bool:
+    """¿La cadena de conexión sigue teniendo los valores de ejemplo?"""
+    if not cadena:
+        return False
+    minusculas = cadena.lower()
+    return any(patron in minusculas for patron in PATRONES_PLANTILLA)
+
+
 @dataclass(frozen=True)
 class Ajustes:
     connstring: str | None
@@ -48,8 +69,12 @@ class Ajustes:
     usuario_local: str
 
     @property
+    def es_plantilla(self) -> bool:
+        return es_cadena_de_plantilla(self.connstring)
+
+    @property
     def hay_conexion(self) -> bool:
-        return bool(self.connstring)
+        return bool(self.connstring) and not self.es_plantilla
 
     def validar_tabla(self) -> str:
         if not IDENTIFICADOR_SQL.match(self.tabla):
