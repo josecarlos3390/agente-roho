@@ -1,0 +1,15 @@
+# Normaliza los finales de línea para que el repositorio funcione igual en
+# Windows, macOS y Linux.
+* text=auto
+
+# Los scripts de PowerShell se quedan en CRLF (Windows), pero Git convierte al
+# hacer checkout en cada plataforma segun corresponda.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.xlsx binary
+*.ico binary

@@ -1,0 +1,19 @@
+[project]
+name = "agente-roho"
+version = "0.1.0"
+description = "Panel de informes de ventas y servidor MCP sobre SQL Server (solo lectura)"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "streamlit>=1.40",
+    "plotly>=5.24",
+    "pandas>=2.2",
+    "pyodbc>=5.1",
+    "openpyxl>=3.1",
+    "mcp>=2",
+]
+
+# Es una aplicación, no una librería: no hay que instalar el propio proyecto.
+[tool.uv]
+package = false

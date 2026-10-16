@@ -1,0 +1,12 @@
+# Servidor MCP del proyecto para Codex CLI.
+# Cópialo a ~/.codex/config.toml para tenerlo en todos los proyectos,
+# o déjalo aquí (Codex lo lee solo en proyectos de confianza).
+#
+# El servidor lee la conexión de .env.local, así que no se pasan credenciales
+# por variables de entorno ni quedan en el control de versiones.
+
+[mcp_servers.agente-roho]
+command = "uv"
+args = ["run", "servidor_mcp.py"]
+cwd = "."
+startup_timeout_sec = 120

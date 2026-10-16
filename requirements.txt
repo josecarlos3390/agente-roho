@@ -1,0 +1,11 @@
+# Panel de informes (Streamlit + Plotly + pandas) y acceso a SQL Server
+streamlit>=1.40
+plotly>=5.24
+pandas>=2.2
+pyodbc>=5.1
+openpyxl>=3.1
+
+# Servidor MCP (servidor_mcp.py) para usar los informes desde Claude, Codex,
+# VS Code/Copilot, Cursor y cualquier cliente compatible con MCP.
+# Requiere la v2 o superior: la API antigua usaba FastMCP y ahora es MCPServer.
+mcp>=2

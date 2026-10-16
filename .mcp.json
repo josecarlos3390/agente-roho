@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "agente-roho": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "servidor_mcp.py"]
+    }
+  }
+}
